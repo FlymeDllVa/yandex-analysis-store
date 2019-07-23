@@ -121,3 +121,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+.idea/ya-school.iml
+.idea/workspace.xml
+.idea/vcs.xml
+.idea/modules.xml
+.idea/misc.xml
+.idea/dataSources.xml
+.idea/dataSources.local.xml
+.idea/codeStyles/codeStyleConfig.xml
+.DS_Store
