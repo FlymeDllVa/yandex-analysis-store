@@ -57,11 +57,14 @@ class Citizen(db.Model):
             return current_import.citizens
         return None
 
+    def find_citizen(import_id, citizen_id):
+        return Citizen.query.filter_by(import_id=import_id, citizen_id=citizen_id).first()
+
     def update_citizens(import_id, citizen_id, args):
         global connects_residents
         connects_residents = False
 
-        citizen = Citizen.query.filter_by(import_id=import_id, citizen_id=citizen_id).first()
+        citizen = Citizen.find_citizen(import_id, citizen_id)
 
         try:
             if "name" in args:citizen.name = args["name"]
@@ -70,6 +73,7 @@ class Citizen(db.Model):
             if "relatives" in args:
                 citizen.relatives_ids = args["relatives"]
                 for item in citizen.relatives_ids:
+                    citizen.relatives = list()
                     found_citizen = Citizen.query.filter_by(import_id=import_id, citizen_id=item).first()
                     if found_citizen:
                         citizen.relatives.append(found_citizen)
@@ -100,11 +104,8 @@ class Citizen(db.Model):
         def check_connects_residents():
             global connects_residents
             if connects_residents is False:
-                print("connects_residents is FALSE")
                 sleep(0.1)
                 check_connects_residents()
-            else:
-                print("connects_residents is TRUE")
         connects_residents = True
         current_import = Citizen.get_citizens(import_id)
         if current_import:
