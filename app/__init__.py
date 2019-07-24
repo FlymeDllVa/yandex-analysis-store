@@ -14,6 +14,8 @@ connects_residents = False
 from app import models, resources
 from app.models import Citizen, Imports
 
+# db.drop_all()
+db.create_all()
 """
 API
 """

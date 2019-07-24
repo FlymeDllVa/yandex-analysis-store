@@ -117,7 +117,7 @@ class API_Get_Citizen_Percentile(Resource):
                 else:
                     cities[citizen.town] = [calculate_age(citizen.birth_date)]
             return jsonify({"data": [{"town": city,
-                                      "p50": percentile(ages, 0.5),
-                                      "p75": percentile(ages, 0.75),
-                                      "p99": percentile(ages, 0.99)} for city, ages in cities.items()]})
+                                      "p50": percentile(sorted(ages), 0.5),
+                                      "p75": percentile(sorted(ages), 0.75),
+                                      "p99": percentile(sorted(ages), 0.99)} for city, ages in cities.items()]})
         abort(400)

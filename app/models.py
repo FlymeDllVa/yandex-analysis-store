@@ -6,12 +6,14 @@ class Imports(db.Model):
     __tablename__ = 'imports'
     import_id = db.Column(db.Integer, autoincrement=True, primary_key=True, index=True)
 
-    def add_import(new_import):
+    @classmethod
+    def add_import(self, new_import):
         db.session.add(new_import)
         db.session.commit()
         return new_import.import_id
 
-    def find_import(import_id):
+    @classmethod
+    def find_import(self, import_id):
         current_import = Imports.query.filter_by(import_id=import_id).first()
         if current_import:
             return current_import
@@ -51,16 +53,19 @@ class Citizen(db.Model):
                                 lazy='dynamic'
                                 )
 
-    def get_citizens(import_id):
+    @classmethod
+    def get_citizens(self, import_id):
         current_import = Imports.find_import(import_id)
         if current_import:
             return current_import.citizens
         return None
 
-    def find_citizen(import_id, citizen_id):
+    @classmethod
+    def find_citizen(self, import_id, citizen_id):
         return Citizen.query.filter_by(import_id=import_id, citizen_id=citizen_id).first()
 
-    def update_citizens(import_id, citizen_id, args):
+    @classmethod
+    def update_citizens(self, import_id, citizen_id, args):
         global connects_residents
         connects_residents = False
 
@@ -99,7 +104,8 @@ class Citizen(db.Model):
         connects_residents = True
         return response
 
-    def connect_citizens(import_id):
+    @classmethod
+    def connect_citizens(self, import_id):
         global connects_residents
         def check_connects_residents():
             global connects_residents
@@ -114,6 +120,5 @@ class Citizen(db.Model):
                 for item in relatives:
                     citizen.append(Citizen.query.filter_by(import_id=import_id, citizen_id=item).first())
                 check_connects_residents()
-                print(citizen_id)
             db.session.commit()
         connects_residents = False
