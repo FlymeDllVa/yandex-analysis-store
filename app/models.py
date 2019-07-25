@@ -1,23 +1,22 @@
-from app import db, connects_residents
+from app import db
 from datetime import datetime
-from time import sleep
 
 class Imports(db.Model):
     __tablename__ = 'imports'
     import_id = db.Column(db.Integer, autoincrement=True, primary_key=True, index=True)
 
     @classmethod
-    def add_import(self, new_import):
+    def add_import(cls, new_import):
         db.session.add(new_import)
         db.session.commit()
         return new_import.import_id
 
     @classmethod
-    def find_import(self, import_id):
-        current_import = Imports.query.filter_by(import_id=import_id).first()
-        if current_import:
-            return current_import
-        return None
+    def delete_import(cls, import_id):
+        Imports.query.filter_by(import_id=import_id).delete()
+        db.session.commit()
+        return True
+
 
 
 class Citizen(db.Model):
@@ -25,49 +24,35 @@ class Citizen(db.Model):
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True, index=True)
 
-    imports = db.relationship("Imports", backref="citizens")
-    import_id = db.Column(db.Integer, db.ForeignKey(
-        'imports.import_id', ondelete='CASCADE'), index=True)
-
+    import_id = db.Column(db.Integer, index=True)
     citizen_id = db.Column(db.Integer, index=True)
     town = db.Column(db.String(256))
     street = db.Column(db.String(256))
     building = db.Column(db.String(256))
     appartement = db.Column(db.Integer)
     name = db.Column(db.String(256))
-    birth_date = db.Column(db.DateTime, index=True)
+    birth_date = db.Column(db.DateTime)
     gender = db.Column(db.String(256))
-    relatives_ids = db.Column(db.ARRAY(db.Integer))
-
-    kindred = db.Table('relatives',
-                       db.Column('id', db.Integer, autoincrement=True, primary_key=True, index=True),
-                       db.Column('citizen_id', db.Integer, db.ForeignKey('citizens.id'), index=True),
-                       db.Column('relatives_id', db.Integer, db.ForeignKey('citizens.id'), index=True)
-                       )
-
-    relatives = db.relationship('Citizen',
-                                secondary=kindred,
-                                primaryjoin=(kindred.c.citizen_id == id),
-                                secondaryjoin=(kindred.c.relatives_id == id),
-                                backref=db.backref('kindred', lazy='dynamic'),
-                                lazy='dynamic'
-                                )
+    relatives = db.Column(db.ARRAY(db.Integer))
 
     @classmethod
-    def get_citizens(self, import_id):
-        current_import = Imports.find_import(import_id)
+    def save_list_citizens(cls, data):
+        db.session.bulk_save_objects(data)
+        db.session.commit()
+
+    @classmethod
+    def get_citizens(cls, import_id):
+        current_import = Citizen.query.filter_by(import_id=import_id).all()
         if current_import:
-            return current_import.citizens
+            return current_import
         return None
 
     @classmethod
-    def find_citizen(self, import_id, citizen_id):
+    def find_citizen(cls, import_id, citizen_id):
         return Citizen.query.filter_by(import_id=import_id, citizen_id=citizen_id).first()
 
     @classmethod
-    def update_citizens(self, import_id, citizen_id, args):
-        global connects_residents
-        connects_residents = False
+    def update_citizens(cls, import_id, citizen_id, args):
 
         citizen = Citizen.find_citizen(import_id, citizen_id)
 
@@ -99,26 +84,6 @@ class Citizen(db.Model):
                     "name": citizen.name,
                     "birth_date": citizen.birth_date.strftime('%d.%m.%Y'),
                     "gender": citizen.gender,
-                    "relatives": citizen.relatives_ids}
+                    "relatives": citizen.relatives}
 
-        connects_residents = True
         return response
-
-    @classmethod
-    def connect_citizens(self, import_id):
-        global connects_residents
-        def check_connects_residents():
-            global connects_residents
-            if connects_residents is False:
-                sleep(0.1)
-                check_connects_residents()
-        connects_residents = True
-        current_import = Citizen.get_citizens(import_id)
-        if current_import:
-            for citizen_id, relatives in {citizen.citizen_id: citizen.relatives_ids for citizen in current_import if citizen.relatives_ids}.items():
-                citizen = Citizen.query.filter_by(import_id=import_id, citizen_id=citizen_id).first().relatives
-                for item in relatives:
-                    citizen.append(Citizen.query.filter_by(import_id=import_id, citizen_id=item).first())
-                check_connects_residents()
-            db.session.commit()
-        connects_residents = False

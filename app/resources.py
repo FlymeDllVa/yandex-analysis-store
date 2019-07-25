@@ -1,54 +1,47 @@
-from flask import Flask, jsonify, abort, request
-from flask_restful import Api, Resource, reqparse, abort
-from app import app, db
+from app import db_redis
 from app.models import Imports, Citizen
-from datetime import datetime, date
+from flask import jsonify, abort, request
+from flask_restful import Resource, abort
+from datetime import date, datetime
 from math import ceil, floor
-from functools import partial
-from threading import Thread
-
 
 class API_Add_Import(Resource):
     def post(self):
-
-        new_import = Imports()
-        data, relatives = {}, {}
-
-        for citizen in request.get_json()["citizens"]:
-            print(citizen["citizen_id"])
-            new_import.citizens.append(Citizen(citizen_id=citizen["citizen_id"],
-                                               town=citizen["town"],
-                                               street=citizen["street"],
-                                               building=citizen["building"],
-                                               appartement=citizen["appartement"],
-                                               name=citizen["name"],
-                                               birth_date=datetime.strptime(citizen["birth_date"], '%d.%m.%Y').date(),
-                                               gender=citizen["gender"],
-                                               relatives_ids=citizen["relatives"]))
-
-        new_import = Imports.add_import(new_import)
-        if new_import:
-            flow = Thread(target=Citizen.connect_citizens, args=(new_import,))
-            print(flow.name)
-            flow.start()
-            return jsonify({"data": {"import_id": new_import}})
-        abort(400)
+        def check_args(args, import_id):
+            if "citizens" in args:
+                data, citizens = dict(), list()
+                if "citizens" not in args: return None
+                for citizen in args["citizens"]:
+                    if "citizen_id" not in citizen: return None
+                    data.update({citizen["citizen_id"]: citizen})
 
 
-class API_Get_Citizens(Resource):
-    def get(self, import_id):
-        all_citizens = Citizen.get_citizens(import_id)
-        if all_citizens:
-            all_citizens = [{"citizen_id": citizen.citizen_id,
-                             "town": citizen.town,
-                             "street": citizen.street,
-                             "building": citizen.building,
-                             "appartement": citizen.appartement,
-                             "name": citizen.name,
-                             "birth_date": citizen.birth_date.strftime('%d.%m.%Y'),
-                             "gender": citizen.gender,
-                             "relatives_ids": citizen.relatives_ids} for citizen in all_citizens]
-            return jsonify({"data": all_citizens})
+                for citizen_id, citizen in data.items():
+                    citizen["birth_date"] = datetime.strptime(citizen["birth_date"], '%d.%m.%Y').date()
+                    try:
+                        citizens.append(Citizen(import_id=import_id,
+                                                citizen_id=citizen["citizen_id"],
+                                                town=citizen["town"],
+                                                street=citizen["street"],
+                                                building=citizen["building"],
+                                                appartement=int(citizen["appartement"]),
+                                                name=citizen["name"],
+                                                birth_date=citizen["birth_date"],
+                                                gender=citizen["gender"],
+                                                relatives=citizen["relatives"]))
+                    except Exception:
+                        return None
+                    db_redis.set(f"{import_id}_{citizen_id}_birth_date", str(citizen["birth_date"].month))
+                db_redis.bgsave()
+                return citizens
+            return None
+        import_id = Imports.add_import(Imports())
+        print(import_id)
+        data = check_args(request.get_json(), import_id)
+        if data:
+            Citizen.save_list_citizens(data)
+            return jsonify({"data": {"import_id": import_id}})
+        Imports.delete_import(import_id)
         abort(400)
 
 
@@ -60,22 +53,39 @@ class API_Update_Citizen(Resource):
         abort(400)
 
 
+class API_Get_Citizens(Resource):
+    def get(self, import_id):
+        citizens = Citizen.get_citizens(import_id)
+        if citizens:
+            data = list()
+            for citizen in citizens:
+                data.append({"citizen_id": citizen.citizen_id,
+                         "town": citizen.town,
+                         "street": citizen.street,
+                         "building": citizen.building,
+                         "appartement": citizen.appartement,
+                         "name": citizen.name,
+                         "birth_date": citizen.birth_date.strftime('%d.%m.%Y'),
+                         "gender": citizen.gender,
+                         "relatives": citizen.relatives})
+            return jsonify({"data": data})
+        abort(400)
+
+
 class API_Get_Gifts(Resource):
     def get(self, import_id):
-        birthday = {1: dict(), 2: dict(), 3: dict(), 4: dict(), 5: dict(), 6: dict(), 7: dict(), 8: dict(), 9: dict(),
-                    10: dict(), 11: dict(), 12: dict()}
+        birthday = {1: dict(), 2: dict(), 3: dict(), 4: dict(), 5: dict(), 6: dict(), 7: dict(),
+                    8: dict(), 9: dict(), 10: dict(), 11: dict(), 12: dict()}
         citizens = Citizen.get_citizens(import_id)
 
         if citizens:
             for citizen in citizens:
-                for kindred in citizen.relatives_ids:
-                    month = Citizen.find_citizen(import_id, kindred).birth_date.month
-                    if citizen.citizen_id in birthday[month]:
-                        birthday[month][citizen.citizen_id] = birthday[month][citizen.citizen_id] + 1
-                    else:
-                        birthday[month].update({citizen.citizen_id: 1})
-            return jsonify({"data": {str(month): [{"citizen_id": citizen_id,
-                                                   "presents": presents} for citizen_id, presents in data.items()] for
+                for citizen_id in citizen.relatives:
+                    month = int(db_redis.get(f"{import_id}_{citizen_id}_birth_date"))
+                    birthday[month].update({citizen.citizen_id: birthday[month].get(citizen.citizen_id, 0) + 1})
+            return jsonify({"data":{str(month): [{"citizen_id": citizen_id,
+                                                   "presents": presents} for citizen_id,
+                                                                             presents in data.items()] for
                                      month, data in birthday.items()}})
         abort(400)
 

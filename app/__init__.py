@@ -1,21 +1,21 @@
 from flask import Flask
-
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
+from redis import Redis
 from config import Flask_Config
 
 app = Flask(__name__)
 app.config.from_object(Flask_Config)
 
 db = SQLAlchemy(app)
-
-connects_residents = False
+db_redis = Redis(host='localhost', port=6379, db=0)
 
 from app import models, resources
-from app.models import Citizen, Imports
+from app.models import Imports, Citizen
 
 # db.drop_all()
 db.create_all()
+db_redis.flushall()
 """
 API
 """
