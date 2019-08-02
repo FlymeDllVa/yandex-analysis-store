@@ -1,5 +1,5 @@
-from app import db_redis
-from app.models import Imports, Citizen
+import re
+from app.project.models import Imports, Citizen
 from flask import request
 from flask_restful import Resource, abort
 from datetime import date, datetime
@@ -19,7 +19,7 @@ class API_Add_Import(Resource):
             Checks the arguments for validity
 
             :param args: import arguments
-            :return: validated data or HTTP request 400
+            :return: validated data or None
             """
             if "citizens" in args:
                 data = dict()
@@ -33,14 +33,22 @@ class API_Add_Import(Resource):
                                 isinstance(citizen["relatives"], list):
                             try:
                                 citizen["birth_date"] = datetime.strptime(citizen["birth_date"], '%d.%m.%Y').date()
-                            except ValueError:
+                            except Exception:
                                 return None
-                            data.update({citizen["citizen_id"]: dict(town=citizen["town"], street=citizen["street"],
-                                                                     building=citizen["building"], name=citizen["name"],
-                                                                     apartment=citizen["apartment"],
-                                                                     birth_date=citizen["birth_date"],
-                                                                     gender=citizen["gender"],
-                                                                     relatives=citizen["relatives"])})
+                            if re.fullmatch(r'^\w+(\s\w+|(\s\w+){2})', citizen["name"]) and \
+                                    re.fullmatch(r'^female|male', citizen["gender"]) and \
+                                    re.search(r'^[\w\d]+', citizen["building"]) and \
+                                    re.search(r'^[\w\d]+', citizen["street"]) and \
+                                    re.search(r'^[\D]+', citizen["town"]):
+                                data.update({citizen["citizen_id"]: dict(town=citizen["town"], street=citizen["street"],
+                                                                         building=citizen["building"],
+                                                                         name=citizen["name"],
+                                                                         apartment=citizen["apartment"],
+                                                                         birth_date=citizen["birth_date"],
+                                                                         gender=citizen["gender"],
+                                                                         relatives=citizen["relatives"])})
+                            else:
+                                return None
                         else:
                             return None
                     else:
@@ -60,7 +68,7 @@ class API_Add_Import(Resource):
             import_id = Imports.add_import(Imports())
             request_data = list()
             for citizen_id, citizen in data.items():
-                db_redis.set(f"{import_id}_{citizen_id}_birth_date", citizen["birth_date"].month)
+                Citizen.set_birth_month(f"{import_id}_{citizen_id}_birth_date", citizen["birth_date"].month)
                 request_data.append(
                     Citizen(import_id=import_id, citizen_id=citizen_id, town=citizen["town"], street=citizen["street"],
                             building=citizen["building"], apartment=int(citizen["apartment"]), name=citizen["name"],
@@ -72,7 +80,6 @@ class API_Add_Import(Resource):
         abort(400)
 
 
-### TODO не работает! Все будет!
 class API_Update_Citizen(Resource):
     def patch(self, import_id, citizen_id):
         """
@@ -82,9 +89,74 @@ class API_Update_Citizen(Resource):
         :param citizen_id: current import person identifier
         :return: the answer
         """
-        update = Citizen.update_citizens(import_id, citizen_id, request.get_json())
-        if update:
-            return {"data": update}
+
+        def check_args(args):
+            """
+            Checks the arguments for validity
+
+            :param args: import arguments
+            :return: validated data or None
+            """
+            if any(item in args for item in
+                   ["town", "street", "building", "apartment", "name", "birth_date", "gender", "relatives"]):
+                if "name" in args:
+                    if not re.fullmatch(r'^\w+(\s\w+|(\s\w+){2})', args["name"]):
+                        return None
+                if "gender" in args:
+                    if not re.fullmatch(r'^female|male', args["gender"]):
+                        return None
+                if "birth_date" in args:
+                    try:
+                        args["birth_date"] = datetime.strptime(args["birth_date"], '%d.%m.%Y').date()
+                    except Exception:
+                        return None
+                if "town" in args:
+                    if not re.search(r'^[\w]+', args["town"]):
+                        return None
+                if "street" in args:
+                    if not re.search(r'^[\w\d]+', args["street"]):
+                        return None
+                if "building" in args:
+                    if not re.search(r'^[\w\d]+', args["building"]):
+                        return None
+                if "apartment" in args:
+                    if not isinstance(args["apartment"], int):
+                        return None
+                if "relatives" in args:
+                    for relative in args["relatives"]:
+                        if not Citizen.find_citizen(import_id, relative):
+                            return None
+                return args
+            return None
+
+        citizen = Citizen.find_citizen(import_id, citizen_id)
+        args = check_args(request.get_json())
+        if citizen and args:
+            if "name" in args:
+                citizen.name = args["name"]
+            if "gender" in args:
+                citizen.gender = args["gender"]
+            if "birth_date" in args:
+                citizen.birth_date = args["birth_date"]
+            if "town" in args:
+                citizen.town = args["town"]
+            if "street" in args:
+                citizen.street = args["street"]
+            if "building" in args:
+                citizen.building = args["building"]
+            if "apartment" in args:
+                citizen.apartment = args["apartment"]
+            if "relatives" in args:
+                for people in set(citizen.relatives) - set(args["relatives"]):
+                    Citizen.remove_relatives_citizens(import_id, people, citizen_id)
+                for people in args["relatives"]:
+                    Citizen.append_relatives_citizens(import_id, people, citizen_id)
+                citizen.relatives = args["relatives"]
+            Citizen.db_commit()
+            return {"data": dict(citizen_id=citizen.citizen_id, town=citizen.town, street=citizen.street,
+                                 building=citizen.building, apartment=citizen.apartment, name=citizen.name,
+                                 birth_date=citizen.birth_date.strftime('%d.%m.%Y'), gender=citizen.gender,
+                                 relatives=citizen.relatives)}
         abort(400)
 
 
@@ -114,13 +186,14 @@ class API_Get_Gifts(Resource):
         :param import_id: indexer import
         :return: the answer
         """
+
         birthday = {1: dict(), 2: dict(), 3: dict(), 4: dict(), 5: dict(), 6: dict(), 7: dict(),
                     8: dict(), 9: dict(), 10: dict(), 11: dict(), 12: dict()}
         citizens = Citizen.get_citizens(import_id)
         if citizens:
             for citizen in citizens:
                 for citizen_id in citizen.relatives:
-                    month = int(db_redis.get(f"{import_id}_{citizen_id}_birth_date"))
+                    month = Citizen.get_birth_month(f"{import_id}_{citizen_id}_birth_date", 'int')
                     birthday[month].update({citizen.citizen_id: birthday[month].get(citizen.citizen_id, 0) + 1})
             return {"data": {str(month): [{"citizen_id": citizen_id,
                                            "presents": presents} for citizen_id,
@@ -158,15 +231,15 @@ class API_Get_Citizen_Percentile(Resource):
             d1 = key(N[int(c)]) * (k - f)
             return d0 + d1
 
-        def calculate_age(born):
+        def calculate_age(citizen_date):
             """
             Calculates a person's age by date of birth
 
-            :param born: date of birth
+            :param citizen_date: date of birth
             :return: age
             """
             today = date.today()
-            return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+            return today.year - citizen_date.year - ((today.month, today.day) < (citizen_date.month, citizen_date.day))
 
         cities = dict()
         citizens = Citizen.get_citizens(import_id)

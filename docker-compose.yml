@@ -1,0 +1,49 @@
+version: '3.3'
+services:
+  web:
+    restart: always
+    build: app
+    volumes:
+      - ./app:/app
+    expose:
+      - "5000"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=ya
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=redis
+    command: gunicorn --log-level info app:app -b 0.0.0:5000 --name app --log-file=- --workers=5 --threads=2
+    depends_on:
+      - postgres
+  nginx:
+    restart: always
+    image: nginx:1.17.2
+    volumes:
+      - ./docker/nginx:/etc/nginx/conf.d
+      - ./app/static:/app/static
+    links:
+      - web:web
+    ports:
+      - "8080:8080"
+    depends_on:
+      - web
+  postgres:
+    restart: always
+    image: postgres:11.4
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ya
+  redis:
+    restart: always
+    image: redis:5.0.5
+    volumes:
+      - ./docker/redis/data:/data
+    command: redis-server --requirepass redis
+    ports:
+      - "6379:6379"
