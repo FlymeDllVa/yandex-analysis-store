@@ -35,7 +35,7 @@ class API_Add_Import(Resource):
                                 citizen["birth_date"] = datetime.strptime(citizen["birth_date"], '%d.%m.%Y').date()
                             except Exception:
                                 return None
-                            if re.fullmatch(r'^\w+(\s\w+|(\s\w+){2})', citizen["name"]) and \
+                            if re.fullmatch(r'^[\D]+', citizen["name"]) and \
                                     re.fullmatch(r'^female|male', citizen["gender"]) and \
                                     re.search(r'^[\w\d]+', citizen["building"]) and \
                                     re.search(r'^[\w\d]+', citizen["street"]) and \
