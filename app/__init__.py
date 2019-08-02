@@ -23,9 +23,6 @@ from app.project.models import Imports, Citizen
 # db_redis.flushall()
 # db.create_all()
 
-"""
-API
-"""
 api = Api(app)
 
 api.add_resource(resources.API_Add_Import, '/imports')
@@ -34,9 +31,6 @@ api.add_resource(resources.API_Get_Citizens, '/imports/<int:import_id>/citizens'
 api.add_resource(resources.API_Get_Gifts, '/imports/<int:import_id>/citizens/birthdays')
 api.add_resource(resources.API_Get_Citizen_Percentile, '/imports/<int:import_id>/towns/stat/percentile/age')
 
-"""
-ROUTE
-"""
 @app.route('/')
 @app.route('/index')
 def index():
