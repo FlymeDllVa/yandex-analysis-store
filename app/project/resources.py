@@ -14,7 +14,7 @@ class API_Add_Import(Resource):
         :return: import_id
         """
 
-        def check_args(args):
+        def check_args(args) -> dict or None:
             """
             Checks the arguments for validity
 
@@ -65,7 +65,7 @@ class API_Add_Import(Resource):
 
         data = check_args(request.get_json())
         if data:
-            import_id = Imports.add_import(Imports())
+            import_id = Imports.add_import()
             request_data = list()
             for citizen_id, citizen in data.items():
                 Citizen.set_birth_month(f"{import_id}_{citizen_id}_birth_date", citizen["birth_date"].month)
@@ -90,7 +90,7 @@ class API_Update_Citizen(Resource):
         :return: the answer
         """
 
-        def check_args(args):
+        def check_args(args) -> dict or None:
             """
             Checks the arguments for validity
 
@@ -211,7 +211,7 @@ class API_Get_Citizen_Percentile(Resource):
         :return: the answer
         """
 
-        def percentile(N, percent, key=lambda x: x):
+        def percentile(N, percent, key=lambda x: x) -> int:
             """
             Find the percentile of a list of values.
 
@@ -231,7 +231,7 @@ class API_Get_Citizen_Percentile(Resource):
             d1 = key(N[int(c)]) * (k - f)
             return d0 + d1
 
-        def calculate_age(citizen_date):
+        def calculate_age(citizen_date) -> int:
             """
             Calculates a person's age by date of birth
 

@@ -8,13 +8,16 @@ services:
     expose:
       - "5000"
     environment:
+      - SECRET_KEY=ya
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_DB=ya
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=redis
+      - REDIS_DB=1
     command: gunicorn --log-level info app:app -b 0.0.0:5000 --name app --log-file=- --workers=5 --threads=2
     depends_on:
       - postgres
@@ -33,6 +36,8 @@ services:
   postgres:
     restart: always
     image: postgres:11.4
+    volumes:
+      - ./docker/postgres/db-init-scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     environment:

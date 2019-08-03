@@ -5,13 +5,14 @@ class Imports(db.Model):
     import_id = db.Column(db.Integer, autoincrement=True, primary_key=True, index=True)
 
     @classmethod
-    def add_import(cls, new_import):
+    def add_import(cls) -> int:
         """
         Adds a new import
 
-        :param new_import: Import()
         :return: import_id
         """
+
+        new_import = Imports()
         db.session.add(new_import)
         db.session.commit()
         return new_import.import_id
@@ -34,7 +35,7 @@ class Citizen(db.Model):
     relatives = db.Column(db.ARRAY(db.Integer))
 
     @classmethod
-    def db_commit(cls):
+    def db_commit(cls) -> None:
         """
         Database commit
 
@@ -42,10 +43,9 @@ class Citizen(db.Model):
         """
 
         db.session.commit()
-        return True
 
     @classmethod
-    def save_list_citizens(cls, data):
+    def save_list_citizens(cls, data) -> None:
         """
         Keeps people in the database
 
@@ -55,10 +55,10 @@ class Citizen(db.Model):
 
         db.session.bulk_save_objects(data)
         db.session.commit()
-        return True
+
 
     @classmethod
-    def get_citizens(cls, import_id):
+    def get_citizens(cls, import_id) -> object or None:
         """
         Returns a list of people for a single import
 
@@ -72,7 +72,7 @@ class Citizen(db.Model):
         return None
 
     @classmethod
-    def find_citizen(cls, import_id, citizen_id):
+    def find_citizen(cls, import_id, citizen_id) -> object:
         """
         Looking for a man
 
@@ -84,7 +84,7 @@ class Citizen(db.Model):
         return cls.query.filter_by(import_id=import_id, citizen_id=citizen_id).first()
 
     @classmethod
-    def append_relatives_citizens(cls, import_id, citizen_id, updated_id):
+    def append_relatives_citizens(cls, import_id, citizen_id, updated_id) -> None:
         """
         Adds a person to relatives
 
@@ -102,7 +102,7 @@ class Citizen(db.Model):
         db.session.commit()
 
     @classmethod
-    def remove_relatives_citizens(cls, import_id, citizen_id, remove_id):
+    def remove_relatives_citizens(cls, import_id, citizen_id, remove_id) -> None:
         """
         Remove a person to relatives
 
@@ -120,7 +120,7 @@ class Citizen(db.Model):
         db.session.commit()
 
     @classmethod
-    def set_birth_month(cls, key, value):
+    def set_birth_month(cls, key, value) -> None:
         """
         Sets the value for the key in Redis
 
@@ -132,7 +132,7 @@ class Citizen(db.Model):
         db_redis.set(key, value)
 
     @classmethod
-    def get_birth_month(cls, key, request_type=None):
+    def get_birth_month(cls, key, request_type=None) -> int or str:
         """
         Gets the key value from Redis
 
