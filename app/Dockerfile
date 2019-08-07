@@ -1,5 +1,7 @@
 FROM python:3.7.4
 
+ENV TZ=Europe/Moscow
+
 RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
 
 ENV PATH ~/.poetry/bin:$PATH

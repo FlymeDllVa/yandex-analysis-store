@@ -1,5 +1,6 @@
 import re
 from app.project.models import Imports, Citizen
+from app import celery
 from flask import request
 from flask_restful import Resource, abort
 from datetime import date, datetime
@@ -7,6 +8,7 @@ from math import ceil, floor
 
 
 class API_Add_Import(Resource):
+    @celery.task(bind=True)
     def post(self):
         """
         API method that adds import
@@ -81,6 +83,7 @@ class API_Add_Import(Resource):
 
 
 class API_Update_Citizen(Resource):
+    @celery.task(bind=True)
     def patch(self, import_id, citizen_id):
         """
         An API method that updates the import resident information
@@ -100,7 +103,7 @@ class API_Update_Citizen(Resource):
             if any(item in args for item in
                    ["town", "street", "building", "apartment", "name", "birth_date", "gender", "relatives"]):
                 if "name" in args:
-                    if not re.fullmatch(r'^\w+(\s\w+|(\s\w+){2})', args["name"]):
+                    if not re.fullmatch(r'^[\D]+', args["name"]):
                         return None
                 if "gender" in args:
                     if not re.fullmatch(r'^female|male', args["gender"]):
@@ -161,6 +164,7 @@ class API_Update_Citizen(Resource):
 
 
 class API_Get_Citizens(Resource):
+    @celery.task(bind=True)
     def get(self, import_id):
         """
         An API method that returns all residents of a single import
@@ -179,6 +183,7 @@ class API_Get_Citizens(Resource):
 
 
 class API_Get_Gifts(Resource):
+    @celery.task(bind=True)
     def get(self, import_id):
         """
         An API method that calculates the required number of gifts for each month of a single import
@@ -203,6 +208,7 @@ class API_Get_Gifts(Resource):
 
 
 class API_Get_Citizen_Percentile(Resource):
+    @celery.task(bind=True)
     def get(self, import_id):
         """
         An API method that counts the percentile of one import for each city

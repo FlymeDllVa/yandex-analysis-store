@@ -56,7 +56,6 @@ class Citizen(db.Model):
         db.session.bulk_save_objects(data)
         db.session.commit()
 
-
     @classmethod
     def get_citizens(cls, import_id) -> object or None:
         """

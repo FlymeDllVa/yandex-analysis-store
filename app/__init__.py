@@ -3,21 +3,27 @@ from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
 from redis import Redis
+from celery import Celery
 
 app = Flask(__name__)
 app.config.update(
     SECRET_KEY=SECRET_KEY,
     SQLALCHEMY_DATABASE_URI=DATABASE_URI + POSTGRES_DB,
-    SQLALCHEMY_TRACK_MODIFICATIONS=False
+    SQLALCHEMY_TRACK_MODIFICATIONS=False,
+    CELERY_BROKER_URL=f'redis://{REDIS_HOST}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/2',
+    CELERY_RESULT_BACKEND=f'redis://{REDIS_HOST}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/2'
 )
+
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
 
 db = SQLAlchemy(app)
 db_redis = Redis(
     host=REDIS_HOST,
     port=REDIS_PORT,
     password=REDIS_PASSWORD,
-    db=REDIS_DB)
-
+    db=REDIS_DB
+)
 
 from app.project import models, resources
 from app.project.models import Imports, Citizen

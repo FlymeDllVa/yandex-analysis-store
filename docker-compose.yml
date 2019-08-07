@@ -7,20 +7,24 @@ services:
       - ./app:/app
     expose:
       - "5000"
-    environment:
-      - SECRET_KEY=ya
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=ya
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=redis
-      - REDIS_DB=1
-    command: gunicorn --log-level info app:app -b 0.0.0:5000 --name app --log-file=- --workers=5 --threads=2
+    env_file:
+      - ./environment.env
+    command: gunicorn --log-level info app:app -b 0.0.0:5000 --name app --workers=9 --threads=4
+    depends_on:
+      - celery
+    links:
+      - celery
+  celery:
+    restart: always
+    build: app
+    volumes:
+      - ./app:/app
+    env_file:
+      - ./environment.env
+    command: celery worker -A app.celery --loglevel=info
     depends_on:
       - postgres
+      - redis
   nginx:
     restart: always
     image: nginx:1.17.2
@@ -40,10 +44,8 @@ services:
       - ./docker/postgres/db-init-scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=ya
+    env_file:
+      - ./environment.env
   redis:
     restart: always
     image: redis:5.0.5
