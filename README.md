@@ -11,7 +11,7 @@
 ## Технологии
 Проект использует следующие технологии:
 * [``Docker 19.03.1``](https://github.com/docker) и [``docker-compose 1.24.1``](https://github.com/docker/compose)
-    * [``Python 3.7.4``](https://github.com/python) с [``poetry 0.1.0``](https://github.com/sdispater/poetry) менеджер зависимостей
+    * [``Python 3.7.4``](https://github.com/python) с менеджером зависимостей [``poetry 0.1.0``](https://github.com/sdispater/poetry)
         * Встроенные зависимости
             * re – регулярные выражение для проверки импорта
             * math – для вычисления процентилей
@@ -31,6 +31,7 @@
     * [``Redis 5.0.5``](https://github.com/antirez/redis) – NoSQL система управления базами данных
 
 Архитектура проекта:
+
 <img src="https://raw.githubusercontent.com/FlymeDllVa/ya-school/master/app/static/images/architecture.png?token=AH5ZRUY5576WRNRM52I2MTK5KWCMK" align="center" />
 
 ## Тесты
