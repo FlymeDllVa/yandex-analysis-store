@@ -41,5 +41,42 @@ api.add_resource(resources.API_Get_Citizen_Percentile, '/imports/<int:import_id>
 
 @app.route('/')
 @app.route('/index')
-def index():
-    return render_template("index.html")
+def index() -> render_template:
+    """
+    Render Index.html
+
+    :return: render_template
+    """
+
+    def get_word_number(number, word, one, two, five) -> str:
+        """
+        The correct case depending on the number
+
+        :param number: number
+        :param word: word
+        :param one:
+        :param two:
+        :param five:
+        :return: correct word
+        """
+
+        number = abs(number)
+        number %= 100
+        if number >= 5 and number <= 20:
+            return word + five
+        number %= 10
+        if number == 1:
+            return word + one
+        if number >= 2 and number <= 4:
+            return word + two
+        return word + five
+
+    imports = db.session.query(Imports).count()
+    citizens = db.session.query(Citizen).count()
+    imports_word = get_word_number(imports, "импор", "т", "та", "тов")
+    citizens_word = get_word_number(citizens, "жител", "ь", "я", "ей")
+    return render_template("index.html",
+                           imports=imports,
+                           citizens=citizens,
+                           imports_word=imports_word,
+                           citizens_word=citizens_word)

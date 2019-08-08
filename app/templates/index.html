@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- My CSS -->
+    <link href="../static/css/styles.css" rel="stylesheet" type="text/css">
+
+    <title>Анализ интернет-магазина</title>
+  </head>
+  <body>
+
+    <nav class="container-fluid container-fluid shadow-sm p-4 mb-4 bg-white rounded">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h1>
+                        Анализ интернет-магазина
+                    </h1>
+                    <h5 class="text-black-50">
+                        REST API сервис
+                    </h5>
+                    <p>
+                        <span class="badge badge-secondary">{{ imports }}</span> {{ imports_word }}<br>
+                        <span class="badge badge-secondary">{{ citizens }}</span> {{ citizens_word }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row row-block">
+            <div class="col-12">
+                <h3 class="mb-3">
+                    Методы
+                </h3>
+                <div class="card mb-3">
+                    <div class="card-body method">
+                        <h5>
+                            <span class="badge badge-pill badge-dark badge-number">1</span>  Принимает на вход набор с данными о жителях в формате json и сохраняет его с уникальным идентификатором import_id
+                        </h5>
+                        <p>
+                            <span class="badge badge-success method-post">POST</span> <span class="method-url">/imports</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body method">
+                        <h5>
+                            <span class="badge badge-pill badge-dark badge-number">2</span>  Изменяет информацию о жителе в указанном наборе данных.
+                        </h5>
+                        <p>
+                            <span class="badge badge-secondary method-patch">PATCH</span> <span class="method-url">/imports/{import_id}/citizens/{citizen_id}</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body method">
+                        <h5>
+                            <span class="badge badge-pill badge-dark badge-number">3</span>  Возвращает список всех жителей для указанного набора данных
+                        </h5>
+                        <p>
+                            <span class="badge badge-primary method-get">GET</span> <span class="method-url">/imports/{import_id}/citizens</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body method">
+                        <h5>
+                            <span class="badge badge-pill badge-dark badge-number">4</span>  Возвращает жителей и количество подарков, которые они будут покупать своим ближайшим родственникам
+                        </h5>
+                        <p>
+                            <span class="badge badge-primary method-get">GET</span> <span class="method-url">/imports/{import_id}/citizens/birthdays</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body method">
+                        <h5>
+                            <span class="badge badge-pill badge-dark badge-number">5</span>  Возвращает статистику по городам для указанного набора данных
+                        </h5>
+                        <p>
+                            <span class="badge badge-primary method-get">GET</span> <span class="method-url">/imports/{import_id}/towns/stat/percentile/age</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="container-fluid container-fluid shadow-sm p-3 mt-3 bg-white rounded">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h5 class="text-black-50">
+                        GitHub <a href="https://github.com/FlymeDllVa">@flymedllva</a>
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </body>
+</html>
