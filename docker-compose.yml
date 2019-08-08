@@ -51,6 +51,6 @@ services:
     image: redis:5.0.5
     volumes:
       - ./docker/redis/data:/data
-    command: redis-server --requirepass redis
+    command: redis-server --requirepass redis --save 900 1 --save 300 10 --save 60 10000 --loglevel ${REDIS_LOGLEVEL:-warning}
     ports:
       - "6379:6379"

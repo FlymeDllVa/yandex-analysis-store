@@ -1,51 +1,52 @@
-# Yandex – Анализ работы интернет-магазина
-> Анализ работы интернет-магазина с помощью PostgreSQL, Redis
+# Yandex – Analysis of the online store
+> Analysis of online store using PostgreSQL, Redis 
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![DockerBuild](https://img.shields.io/docker/cloud/build/flymedllva/ya-school)](https://cloud.docker.com/repository/docker/flymedllva/ya-school/general)
-[![CodeFactor](https://www.codefactor.io/repository/github/flymedllva/ya-school/badge)](https://www.codefactor.io/repository/github/flymedllva/ya-school)
-[![BCH compliance](https://bettercodehub.com/edge/badge/FlymeDllVa/ya-school?branch=master&token=275a7c96cf58b28dfaf240aabc9e74407d15c6eb)](https://bettercodehub.com/)
+[![DockerBuild](https://img.shields.io/docker/cloud/build/flymedllva/yandex-analysis-store)](https://cloud.docker.com/repository/docker/flymedllva/yandex-analysis-store/general)
+[![CodeFactor](https://www.codefactor.io/repository/github/flymedllva/yandex-analysis-store/badge)](https://www.codefactor.io/repository/github/flymedllva/yandex-analysis-store)
+[![BCH compliance](https://bettercodehub.com/edge/badge/FlymeDllVa/yandex-analysis-store?branch=master&token=cc4f0aae99176645b88c251b5a93cf41ec2b8a36)](https://bettercodehub.com/)
 
-<img src="https://raw.githubusercontent.com/FlymeDllVa/ya-school/master/app/static/images/preview.png?token=AH5ZRUYG7ZRMVTHBPYTD6DC5KWCIU" align="center" />
+[Russian README](https://github.com/FlymeDllVa/yandex-analysis-store/blob/master/README_RU.md)
+
+<img src="https://raw.githubusercontent.com/FlymeDllVa/yandex-analysis-store/master/app/static/images/preview.png?token=AH5ZRU72R47B5VOFSCUQRCS5KWHTC" align="center" />
 	
-## Технологии
-Проект использует следующие технологии:
-* [``Docker 19.03.1``](https://github.com/docker) и [``docker-compose 1.24.1``](https://github.com/docker/compose)
-    * [``Python 3.7.4``](https://github.com/python) с менеджером зависимостей [``poetry 0.1.0``](https://github.com/sdispater/poetry)
-        * Встроенные зависимости
-            * re – регулярные выражение для проверки импорта
-            * math – для вычисления процентилей
-            * datetime – для расчета даты и возраста
-            * unittest – тестирование веб-приложения
-            * json – помощник по подготовке тестовых данных
-            * random – помоощник по подготовке тестовых данных генерирующий псевдослучайные числа
-        * Дополнительные зависимости
-            * [``Flask 1.1.1``](https://github.com/pallets/flask) – фреймворк для веб-приложений 
-            * [``Flask-SQLAlchemy 2.4.0``](https://github.com/pallets/flask-sqlalchemy) – ORM прослока для базы данных
-            * [``Flask-RESTful 0.3.7``](https://github.com/flask-restful/flask-restful) – используется для создания RESTful API
-            * [``Psycopg2-binary 2.8.3``](https://github.com/psycopg/psycopg2) – драйвер для PostgreSQL
-            * [``Redis 3.2.1``](https://github.com/andymccurdy/redis-py) – драйвер для Redis
-            * [``Сelery 4.3.0``](https://github.com/celery/celery) – используется для очередей API
-    * [``Ngnix 1.17.2``](https://github.com/nginx/nginx) – обратный веб-прокси-сервер
-    * [``PostgreSQL 11.4``](https://github.com/postgres/postgres) – Реляционная SQL база данных 
-    * [``Redis 5.0.5``](https://github.com/antirez/redis) – NoSQL система управления базами данных
+## Technologies
+Project is created with:
+* [``Docker 19.03.1``](https://github.com/docker) and [``docker-compose 1.24.1``](https://github.com/docker/compose)
+    * [``Python 3.7.4``](https://github.com/python) with [``poetry 0.1.0``](https://github.com/sdispater/poetry) dependency Manager
+        * Built-in dependencies
+            * re – regular expression to validate the import
+            * math – to calculate percentiles
+            * datetime – to calculate date and age
+            * unittest – to test a web application
+            * json – assistant for the preparation of test data
+            * random – assistant for unittest in the preparation of pseudo-random
+        * Third party dependencies
+            * [``Flask 1.1.1``](https://github.com/pallets/flask) – web application framework
+            * [``Flask-SQLAlchemy 2.4.0``](https://github.com/pallets/flask-sqlalchemy) – ORM layer for database
+            * [``Flask-RESTful 0.3.7``](https://github.com/flask-restful/flask-restful) – used for create RESTful API
+            * [``Psycopg2-binary 2.8.3``](https://github.com/psycopg/psycopg2) – driver for PostgreSQL
+            * [``Redis 3.2.1``](https://github.com/andymccurdy/redis-py) – driver for Redis
+            * [``Сelery 4.3.0``](https://github.com/celery/celery) – used for API queues
+    * [``Ngnix 1.17.2``](https://github.com/nginx/nginx) – web proxy server
+    * [``PostgreSQL 11.4``](https://github.com/postgres/postgres) – SQL relational database
+    * [``Redis 5.0.5``](https://github.com/antirez/redis) – NoSQL database management system
 
-Архитектура проекта:
+The architecture of the project:
+<img src="https://raw.githubusercontent.com/FlymeDllVa/yandex-analysis-store/master/app/static/images/architecture.png?token=AH5ZRUYSJYUYTPUUNJCIMBC5KWHTY" align="center" />
 
-<img src="https://raw.githubusercontent.com/FlymeDllVa/ya-school/master/app/static/images/architecture.png?token=AH5ZRUY5576WRNRM52I2MTK5KWCMK" align="center" />
+## Tests
 
-## Тесты
+To run the tests, use "Unittest". Tests are run from the app/tests folder
 
-Для тестов используется "Unittest". Тесты запускаются из папки app/tests
-
-Для выполнения тестов требуется работающий сервер. Тесты используют переменные среды Docker
+A running server is required to run the tests. Tests are used by environment Docker
 
 ```sh
 $ cd app/tests
 $ python3 tests.py
 ```
 
-## Установка
+## Installation
 
 Ubuntu 18.04:
 
@@ -82,8 +83,9 @@ $ docker-compose up -d
 $ sudo systemctl enable docker
 ```
 
-## Автор 
+## Author 
 
 Dmitry Gridnev – flymedllva@gmail.com
 
 @flymedllva – [VK](https://vk.com/flymedllva) – [GitHub](https://github.com/FlymeDllVa)
+
