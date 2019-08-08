@@ -6,10 +6,12 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/flymedllva/yandex-analysis-store/badge)](https://www.codefactor.io/repository/github/flymedllva/yandex-analysis-store)
 [![BCH compliance](https://bettercodehub.com/edge/badge/FlymeDllVa/yandex-analysis-store?branch=master&token=cc4f0aae99176645b88c251b5a93cf41ec2b8a36)](https://bettercodehub.com/)
 
-[Russian README](https://github.com/FlymeDllVa/yandex-analysis-store/blob/master/README_RU.md)
+[The legend of the task](https://github.com/FlymeDllVa/yandex-analysis-store/blob/master/app/static/TASK.pdf)
+
+[Russian readme](https://github.com/FlymeDllVa/yandex-analysis-store/blob/master/README_RU.md)
 
 <img src="https://raw.githubusercontent.com/FlymeDllVa/yandex-analysis-store/master/app/static/images/preview.png?token=AH5ZRU72R47B5VOFSCUQRCS5KWHTC" align="center" />
-	
+
 ## Technologies
 Project is created with:
 * [``Docker 19.03.1``](https://github.com/docker) and [``docker-compose 1.24.1``](https://github.com/docker/compose)
@@ -33,6 +35,7 @@ Project is created with:
     * [``Redis 5.0.5``](https://github.com/antirez/redis) – NoSQL database management system
 
 The architecture of the project:
+
 <img src="https://raw.githubusercontent.com/FlymeDllVa/yandex-analysis-store/master/app/static/images/architecture.png?token=AH5ZRUYSJYUYTPUUNJCIMBC5KWHTY" align="center" />
 
 ## Tests
@@ -74,8 +77,8 @@ $ sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docke
 $ sudo chmod +x /usr/local/bin/docker-compose
 
 # Copy the repository to the server and navigate to this folder (ask for login and password from git)
-$ git clone https://github.com/FlymeDllVa/ya-school
-$ cd ya-school
+$ git clone https://github.com/FlymeDllVa/yandex-analysis-store
+$ cd yandex-analysis-store
 
 # Build and run the project
 $ docker-compose build
