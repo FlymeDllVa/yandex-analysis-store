@@ -10,7 +10,7 @@
 
 [Russian readme](https://github.com/FlymeDllVa/yandex-analysis-store/blob/master/README_RU.md)
 
-<img src="https://raw.githubusercontent.com/FlymeDllVa/yandex-analysis-store/master/app/static/images/preview.png?token=AH5ZRU72R47B5VOFSCUQRCS5KWHTC" align="center" />
+<img src="./app/static/images/preview.png" align="center" />
 
 ## Technologies
 Project is created with:
@@ -36,7 +36,7 @@ Project is created with:
 
 The architecture of the project:
 
-<img src="https://raw.githubusercontent.com/FlymeDllVa/yandex-analysis-store/master/app/static/images/architecture.png?token=AH5ZRUYSJYUYTPUUNJCIMBC5KWHTY" align="center" />
+<img src="./app/static/images/architecture.png" align="center" />
 
 ## Tests
 

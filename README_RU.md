@@ -10,7 +10,7 @@
 
 [English readme](https://github.com/FlymeDllVa/yandex-analysis-store)
 
-<img src="https://raw.githubusercontent.com/FlymeDllVa/yandex-analysis-store/master/app/static/images/preview.png?token=AH5ZRU72R47B5VOFSCUQRCS5KWHTC" align="center" />
+<img src="./app/static/images/preview.png" align="center" />
 
 ## Технологии
 Проект использует следующие технологии:
@@ -36,7 +36,7 @@
 
 Архитектура проекта:
 
-<img src="https://raw.githubusercontent.com/FlymeDllVa/yandex-analysis-store/master/app/static/images/architecture.png?token=AH5ZRUYSJYUYTPUUNJCIMBC5KWHTY" align="center" />
+<img src="./app/static/images/architecture.png" align="center" />
 
 ## Тесты
 
